@@ -46,7 +46,8 @@ class scanner():
                 i += 1
             else:
                 print("Error", self.LISTARE[i][1])
-                i += 1 
+                i += 1
+				
 
     def error(self, detalle):
         print("Error de token",detalle)
