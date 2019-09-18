@@ -21,7 +21,7 @@ class scanner():
         self.TEXTORIGINAL = ''
         self.TOKENS = []
 
-    # Método agregar, agrega las expresiones regulares a una lista 
+    # Método agregar, agrega las expresiones regulares a una lista
     def agregar(self):
         # Se lee el archivo de entrada
         archivo = ""
@@ -30,14 +30,14 @@ class scanner():
                 archivo = open(input("Ingrese el archivo: "))
                 self.TEXTO = archivo.read()
             except:
-                    pass
+                pass
         self.TEXTORIGINAL = self.TEXTO
         self.LISTARE.append((self.INICIO,"Inicio"))
         self.LISTARE.append((self.LUGAR,"Lugar"))
         self.LISTARE.append((self.DISTANCIA,"Distancia"))
         self.LISTARE.append((self.MEDIDA,"Medida"))
         self.LISTARE.append((self.CONECTORES,"Conectores"))
-        self.LISTARE.append((self.CARDINALES,"cardinales"))
+        self.LISTARE.append((self.CARDINALES,"Cardinales"))
         self.LISTARE.append((self.FIN,"Fin"))
         self.LISTARE.append((self.DETALLES,"Detalles"))
 
@@ -68,10 +68,94 @@ class scanner():
         print()
         print("Lista de TOKENS")
         print()
-        print()
         self.TOKENS.sort(key=takeThird)
         for token in self.TOKENS:
+            
             print('<"'+token[0]+'", "'+token[1],'">')
+        print()
+
+# Clase parser
+class parser():
+    def __init__(self, TOKENS):
+        self.TOKENS = TOKENS
+        self.TOKEN = TOKENS[0][0]
+        self.TOKENVALUE = TOKENS[0][1]
+        self.CONTADOR = -1
+        self.EXIST = len(self.TOKENS)-1
+        
+    def nextt(self):
+        self.CONTADOR += 1
+        self.TOKEN = self.TOKENS[self.CONTADOR][0]
+
+    def nexte(self):
+        return self.CONTADOR < self.EXIST
+
+    def direccion(self):
+        pass
+
+    def direccionTica(self):
+        while(self.nexte()):
+            self.nextt()
+            self.inicio()
+        
+    def inicio(self):
+        if(self.TOKEN == "Inicio"):
+            self.nextt()
+            self.lugar()
+        else:
+            self.error("Se esperaba recibir el Token 'Inicio',", self.TOKEN)
+            
+    def lugar(self):
+        if(self.TOKEN == "Lugar"):
+            self.nextt()
+            self.detalles()
+        else:
+            self.error("Se esperaba recibir el Token 'Lugar',", self.TOKEN)
+
+    def detalles(self):
+        if(self.TOKEN == "Detalles"):
+            self.nextt()
+            self.distancia()
+        else:
+            self.error("Se esperaba recibir el Token 'Detalles',", self.TOKEN)
+
+    def distancia(self):
+        if(self.TOKEN == "Distancia"):
+            self.nextt()
+            self.medida()
+        else:
+            self.error("Se esperaba recibir el Token 'Distancia',", self.TOKEN)
+
+    def medida(self):
+        if(self.TOKEN == "Medida"):
+            self.nextt()
+            self.conectores()
+        else:
+            self.error("Se esperaba recibir el Token 'Medida',", self.TOKEN)
+
+    def conectores(self):
+        if(self.TOKEN == "Conectores"):
+            self.nextt()
+            self.cardinales()
+        else:
+            self.error("Se esperaba recibir el Token 'Conectores',", self.TOKEN)
+
+    def cardinales(self):
+        if(self.TOKEN == "Cardinales"):
+            self.nextt()
+            self.fin()
+        else:
+            self.error("Se esperaba recibir el Token 'Cardinales',", self.TOKEN)
+
+    def fin(self):
+        if(self.TOKEN == "Fin"):
+            pass
+        else:
+            self.error("Se esperaba recibir el Token 'Fin',", self.TOKEN)
+
+    def error(self, error, esperado):
+        print(error, "se recibió el token '"+esperado+"'")
+
 
 # Función principal
 if(__name__ == '__main__'):
@@ -79,3 +163,5 @@ if(__name__ == '__main__'):
     scanner.agregar()
     scanner.generador_tokens()
     scanner.imprimir_tokens()
+    parser = parser(scanner.TOKENS)
+    parser.direccionTica()
