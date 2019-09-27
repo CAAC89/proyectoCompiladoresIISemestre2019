@@ -6,6 +6,12 @@ def takeThird(elem):
 
 # Clase scanner
 class scanner():
+    """
+
+        Esta clase recibe como entrada un archivo de texto y permite obtener los tokens utlizando expresiones regulares.
+        Retorna error en caso de no poder analizar texto de entrada
+        
+    """
     def __init__(self):
         # Se definen las expresiones regulares de los tokens y variables
         self.LISTARE = []
@@ -28,6 +34,7 @@ class scanner():
         while(archivo == ""):
             try:
                 archivo = open(input("Ingrese el archivo: "))
+                #archivo = open("prueba.txt")
                 self.TEXTO = archivo.read()
             except:
                 pass
@@ -74,94 +81,181 @@ class scanner():
             print('<"'+token[0]+'", "'+token[1],'">')
         print()
 
+
+# Clase arbol
+class arbol():
+    """
+
+        Esta clase tiene la función de crear un arbol de sintaxis abtracta (AST).
+        Permite agregar hijos, valor e imprimir el árbol visualmente.
+        
+    """
+    def __init__(self, valor = ""):
+        self.elemento = valor
+        self.hijos = []
+        self.elehijos = []
+            
+    def agregar(self, elemento, elemento2):
+        self.hijos.append(elemento)
+        self.elehijos.append(elemento2)
+
+    def setValor(self, valor):
+        self.elemento = valor
+
+    def limpiar(self):
+        self.elemento = ""
+        self.hijos = []
+
+    def ver(self):
+        print(self.elemento)
+        for hijos in self.hijos:
+            print("---->")
+            i = 0
+            largo = len(hijos)
+            while(i < largo):
+                if(i == 0):
+                    print("    ", hijos[i])
+                else:
+                    print("    "*2,"---->", hijos[i], "   ---->  ", self.elehijos[0][i])
+                i += 1
+
+
 # Clase parser
 class parser():
-    def __init__(self, TOKENS):
+    """
+
+        Esta clase verifica que los tokens sean recibidos de la manera correcta.
+        Retorna error en caso de no recibir el token esperado mostrando el detalle.
+
+    """
+    def __init__(self, TOKENS, ARBOL): 
+        self.AST = ARBOL
+        self.FALLO = True
+        self.ASTLIST = []
+        self.TOKENLIST = []
         self.TOKENS = TOKENS
         self.TOKEN = TOKENS[0][0]
         self.TOKENVALUE = TOKENS[0][1]
         self.CONTADOR = -1
         self.EXIST = len(self.TOKENS)-1
         
-    def nextt(self):
+    def nextt(self): # Método que retorna el siguiente token en la lista
         self.CONTADOR += 1
         self.TOKEN = self.TOKENS[self.CONTADOR][0]
+        self.TOKENVALUE = self.TOKENS[self.CONTADOR][1]
 
-    def nexte(self):
+    def nexte(self): # Método que verifica si existe un siguiente token
         return self.CONTADOR < self.EXIST
 
-    def direccion(self):
-        pass
+    #def direccion(self):
+    #    pass
 
     def direccionTica(self):
-        while(self.nexte()):
+        """
+
+            Este método se encarga de iniciar el proceso de Parsing
+
+        """
+        while(self.nexte() and self.FALLO):
             self.nextt()
+            self.ASTLIST = []
+            self.TOKENLIST = [""]
+            self.ASTLIST.append("Direccion")
             self.inicio()
+            if(self.FALLO):
+                self.AST.agregar(self.ASTLIST, self.TOKENLIST)
+        self.AST.ver()
+            
         
-    def inicio(self):
+    def inicio(self): # Comienza el recorrido de clase tipo token Inicio
         if(self.TOKEN == "Inicio"):
+            self.ASTLIST.append("Inicio")
+            self.TOKENLIST.append(self.TOKENVALUE)
             self.nextt()
             self.lugar()
         else:
             self.error("Se esperaba recibir el Token 'Inicio',", self.TOKEN)
             
-    def lugar(self):
+    def lugar(self): # Comienza el recorrido de clase tipo token Lugar
         if(self.TOKEN == "Lugar"):
+            self.ASTLIST.append("Lugar")
+            self.TOKENLIST.append(self.TOKENVALUE)
             self.nextt()
             self.detalles()
         else:
             self.error("Se esperaba recibir el Token 'Lugar',", self.TOKEN)
 
-    def detalles(self):
+    def detalles(self): # Comienza el recorrido de clase tipo token Detalles
         if(self.TOKEN == "Detalles"):
+            self.ASTLIST.append("Detalles")
+            self.TOKENLIST.append(self.TOKENVALUE)
             self.nextt()
             self.distancia()
         else:
             self.error("Se esperaba recibir el Token 'Detalles',", self.TOKEN)
 
-    def distancia(self):
+    def distancia(self): # Comienza el recorrido de clase tipo token Distancia
         if(self.TOKEN == "Distancia"):
+            self.ASTLIST.append("Distancia")
+            self.TOKENLIST.append(self.TOKENVALUE)
             self.nextt()
             self.medida()
         else:
             self.error("Se esperaba recibir el Token 'Distancia',", self.TOKEN)
 
-    def medida(self):
+    def medida(self): # Comienza el recorrido de clase tipo token Medida
         if(self.TOKEN == "Medida"):
+            self.ASTLIST.append("Medida")
+            self.TOKENLIST.append(self.TOKENVALUE)
             self.nextt()
             self.conectores()
         else:
             self.error("Se esperaba recibir el Token 'Medida',", self.TOKEN)
 
-    def conectores(self):
+    def conectores(self): # Comienza el recorrido de clase tipo token Conectores
         if(self.TOKEN == "Conectores"):
+            self.ASTLIST.append("Conectores")
+            self.TOKENLIST.append(self.TOKENVALUE)
             self.nextt()
             self.cardinales()
         else:
             self.error("Se esperaba recibir el Token 'Conectores',", self.TOKEN)
 
-    def cardinales(self):
+    def cardinales(self): # Comienza el recorrido de clase tipo token Cardinales
         if(self.TOKEN == "Cardinales"):
+            self.ASTLIST.append("Cardinales")
+            self.TOKENLIST.append(self.TOKENVALUE)
             self.nextt()
             self.fin()
         else:
             self.error("Se esperaba recibir el Token 'Cardinales',", self.TOKEN)
 
-    def fin(self):
+    def fin(self): # Comienza el recorrido de clase tipo token Fin
         if(self.TOKEN == "Fin"):
-            pass
+            self.ASTLIST.append("Fin")
+            self.TOKENLIST.append(self.TOKENVALUE)
         else:
             self.error("Se esperaba recibir el Token 'Fin',", self.TOKEN)
 
-    def error(self, error, esperado):
-        print(error, "se recibió el token '"+esperado+"'")
+    def error(self, error, esperado):# En caso de que el recorrido no encuentre equivalencia de tipo dará error
+        print("ERROR:", error, "se recibió el token '"+esperado+"'")
+        print()
+        self.FALLO = False
+        self.AST.agregar(self.ASTLIST, self.TOKENLIST)
 
 
 # Función principal
 if(__name__ == '__main__'):
+    """
+
+        En función principal se crean los objetos de las clases para ejecutar el programa.
+        Se crea el Scanner, AST y Parser.
+
+    """
     scanner = scanner()
     scanner.agregar()
     scanner.generador_tokens()
     scanner.imprimir_tokens()
-    parser = parser(scanner.TOKENS)
+    arbol = arbol("DireccionTica")
+    parser = parser(scanner.TOKENS, arbol)
     parser.direccionTica()
